@@ -9,7 +9,7 @@ namespace AOC
     {
         static void Main(string[] args)
         {
-            day16();
+            day7();
         }
 
         static void day1()

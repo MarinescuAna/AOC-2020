@@ -7,7 +7,7 @@ namespace AOC.DaysClass
 {
     public class Day06
     {
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In6.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In6.txt");
         private List<string> groups = new List<string>();
         private int[] frequency = new int[200];
         private List<int> personsInEachGroup = new List<int>();

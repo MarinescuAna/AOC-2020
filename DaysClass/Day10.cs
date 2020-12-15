@@ -6,7 +6,7 @@ namespace AOC.DaysClass
 {
     public class Day10
     {
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In10.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In10.txt");
         private List<int> adapters = new List<int>();
        
         public Day10()

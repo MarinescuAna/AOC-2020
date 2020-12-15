@@ -7,7 +7,7 @@ namespace AOC.DaysClass
 {
     public class Day01
     {
-        private static StreamReader file = new StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In.txt");
+        private static StreamReader file = new StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In.txt");
         private string line;
         private int[] allNumbers = new int[1000];
         private int contor = 0;

@@ -6,7 +6,7 @@ namespace AOC.DaysClass
 {
     public class Day11
     {
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In11.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In11.txt");
         private char[][] map = new char[1000][];
         private int lines = 0;
         private int columns = 0;

@@ -6,7 +6,7 @@ namespace AOC.DaysClass
 {
     public class Day13
     {
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In13.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In13.txt");
         private List<(long, int)> bus = new List<(long, int)>();
         private long myTimestamp = 0;
         private long start = 600000000000000;

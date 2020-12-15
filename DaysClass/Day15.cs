@@ -6,7 +6,7 @@ namespace AOC.DaysClass
 {
     public class Day15
     {
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In15.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In15.txt");
         private Dictionary<long, (long, long)> numbersSpoken = new Dictionary<long, (long, long)>();
         private long turn = 1;
         private long lastSpoke = 0;

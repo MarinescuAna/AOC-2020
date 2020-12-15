@@ -17,7 +17,7 @@ namespace AOC.DaysClass
                 "pid"
             };
 
-        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC\DaysText\In4.txt");
+        private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In4.txt");
         private List<string> passports;
         private List<string> valid_passports = new List<string>();
         public Day04()
