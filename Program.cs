@@ -9,7 +9,7 @@ namespace AOC
     {
         static void Main(string[] args)
         {
-            day7();
+            day18();
         }
 
         static void day1()
@@ -52,7 +52,7 @@ namespace AOC
         {
             Day07 day07 = new Day07();
             day07.Part1();
-            day07.Part2();//?
+            day07.Part2();
         }
 
         static void day8()
@@ -107,7 +107,19 @@ namespace AOC
         {
             Day16 day16 = new Day16();
             day16.Part1();
-            day16.Part2();
+            day16.Part2();//no working..
+        }
+        static void day17()
+        {
+            Day17 day17 = new Day17();
+            day17.Part1();
+            day17.Part2();
+        }
+        static void day18()
+        {
+            Day18 day18 = new Day18();
+            day18.Part1();
+            day18.Part2();
         }
     }
 }
