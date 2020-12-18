@@ -54,18 +54,16 @@ namespace AOC.DaysClass
             }
 
         }
-        private List<int> ChooseNumbers(List<(int, int)> range)
+        private bool IsValid(List<int> ticket)
         {
-            var lists = new List<int>();
-
-            for (var i = 0; i < nearbyTickets.Count; i++)
+            foreach(var range in ranges)
             {
-                if (nearbyTickets[i].Where(u => SearchIn(u, range)).Count() == nearbyTickets[i].Count)
+                if(!ticket.All(x => range.Value.ToList().Any(y => x >= y.Item1 && x <= y.Item2)))
                 {
-                    lists.Add(i);
+                    return false;
                 }
             }
-            return lists;
+            return true;
         }
         private bool IsPartOfRange(int number) =>
             ranges.Where(u => SearchIn(number, u.Value)).Count() != 0;
@@ -80,25 +78,32 @@ namespace AOC.DaysClass
             }
             Console.WriteLine("Day 16: Ticket Translation {0} (part1)", sum);
         }
+        private bool AllNumbersMatch(string key, List<int> tickets) => tickets.All(x => ranges[key].FindIndex(y => x >= y.Item1 && x <= y.Item2)!=-1);
+        private List<List<int>> Transpose(List<List<int>> input)
+        {
+            var result = new List<List<int>>();
+            for (int i = 0; i < input[0].Count(); i++)
+            {
+                result.Add(input.Select(x => x[i]).ToList());
+            }
+            return result;
+        }
         public void Part2()
         {
             long prod = 1;
             var freq = new int[nearbyTickets.Count + 1];
 
-            var validTickets = new List<(string, List<int>)>();
+            var validTickets = nearbyTickets.Where(x => IsValid(x)).ToList();
+            var transposedTickets = Transpose(validTickets);
+            var tickets = transposedTickets.Select((a, i) => (Fields: ranges.Keys.Where(x => AllNumbersMatch(x, a)), Index: i)).OrderBy(x => x.Fields.Count()).ToList();
 
-            foreach (var range in ranges)
-            {
-                validTickets.Add((range.Key, ChooseNumbers(range.Value)));
-            }
-            validTickets = validTickets.OrderByDescending(u => u.Item2.Count).ToList();
-            
+
             var times = new int[21];
 
             for (var ticket = 0; ticket < validTickets.Count; ticket++)
             {
                // Console.WriteLine($"{myTicket[matchingFields.First().Fields]} => {firstMatch.Fields.First()}");
-                Console.WriteLine(ticket+":"+myTicket[ticket] + " => " + validTickets[ticket].Item2.Count+" - "+ validTickets[ticket].Item1);
+                //Console.WriteLine(ticket+":"+myTicket[ticket] + " => " + validTickets[ticket].Item2.Count+" - "+ validTickets[ticket].Item1);
             }
 
             Console.WriteLine("Day 16: Ticket Translation {0} (part2)", prod);

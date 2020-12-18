@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace AOC.DaysClass
@@ -8,18 +9,8 @@ namespace AOC.DaysClass
     public class Day18
     {
         private static StreamReader file = new StreamReader(Constants.Path + "In18.txt");
-        private List<(int, int, int)> ActiveCubes3D = new List<(int, int, int)>();
-        private List<(int, int, int,int)> ActiveCubes4D = new List<(int, int, int,int)>();
-        private List<(int, int, int)> Positions2D = new List<(int, int, int)> {
-        (1, 1,  0), (1, 0,  0), (1, -1,  0), (0, -1,  0), (-1, -1,  0), (-1, 0,  0), (-1, 1,  0), (0, 1,  0),
-            (1, 1,  1), (1, 0,  1), (1, -1,  1), (0, -1,  1), (-1, -1,  1), (-1, 0,  1), (-1, 1,  1), (0, 1,  1), (0, 0,  1),
-            (1, 1, -1), (1, 0, -1), (1, -1, -1), (0, -1, -1), (-1, -1, -1), (-1, 0, -1), (-1, 1, -1), (0, 1, -1), (0, 0, -1)
-        };
-        private List<(int, int, int, int)> Positions4D = new List<(int, int, int, int)> {
-        (1, 1, 0, 0), (1, 0, 0, 0), (1, -1, 0, 0), (0, -1, 0, 0), (-1, -1, 0, 0), (-1, 0, 0, 0), (-1, 1, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (1, 1, 1, 0), (1, 0, 1, 0), (1, -1, 1, 0), (0, -1, 1, 0), (-1, -1, 1, 0), (-1, 0, 1, 0), (-1, 1, 1, 0), (0, 1, 1, 0), (0, 0, -1, 0), (1, 1, -1, 0), (1, 0, -1, 0), (1, -1, -1, 0), (0, -1, -1, 0), (-1, -1, -1, 0), (-1, 0, -1, 0), (-1, 1, -1, 0), (0, 1, -1, 0),
-            (0, 0, 0, 1), (1, 1, 0, 1), (1, 0, 0, 1), (1, -1, 0, 1), (0, -1, 0, 1), (-1, -1, 0, 1), (-1, 0, 0, 1), (-1, 1, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1), (1, 0, 1, 1), (1, -1, 1, 1), (0, -1, 1, 1), (-1, -1, 1, 1), (-1, 0, 1, 1), (-1, 1, 1, 1), (0, 1, 1, 1), (0, 0, -1, 1), (1, 1, -1, 1), (1, 0, -1, 1), (1, -1, -1, 1), (0, -1, -1, 1), (-1, -1, -1, 1), (-1, 0, -1, 1), (-1, 1, -1, 1),
-            (0, 1, -1, 1), (0, 0, 0, -1), (1, 1, 0, -1), (1, 0, 0, -1), (1, -1, 0, -1), (0, -1, 0, -1), (-1, -1, 0, -1), (-1, 0, 0, -1), (-1, 1, 0, -1), (0, 1, 0, -1), (0, 0, 1, -1), (1, 1, 1, -1), (1, 0, 1, -1), (1, -1, 1, -1), (0, -1, 1, -1), (-1, -1, 1, -1), (-1, 0, 1, -1), (-1, 1, 1, -1), (0, 1, 1, -1), (0, 0, -1, -1), (1, 1, -1, -1), (1, 0, -1, -1), (1, -1, -1, -1), (0, -1, -1, -1), (-1, -1, -1, -1), (-1, 0, -1, -1), (-1, 1, -1, -1), (0, 1, -1, -1)
-         };
+        private List<string> Expressions = new List<string>();
+
         public Day18()
         {
             ReadInput();
@@ -28,117 +19,443 @@ namespace AOC.DaysClass
         private void ReadInput()
         {
             var line = string.Empty;
-            var lineIndex = 0;
             while (!string.IsNullOrEmpty(line = file.ReadLine()))
             {
-                for (var col = 0; col < line.Length; col++)
+                Expressions.Add(line.Replace(" ", ""));
+            }
+        }
+        private (long, int) Parantheses(string line, int begin)
+        {
+            long acumulator = 0;
+            var operation = ' ';
+            while (begin < line.Length)
+            {
+                if ("0123456789".Contains(line[begin]))
                 {
-                    if (line[col] == '#')
+                    switch (operation)
                     {
-                        ActiveCubes3D.Add((lineIndex, col, 0));
-                        ActiveCubes4D.Add((lineIndex, col, 0,0));
+                        case '+':
+                            {
+                                acumulator += long.Parse(line[begin].ToString());
+                                break;
+                            }
+                        case '*':
+                            {
+                                acumulator = acumulator == 0 ? long.Parse(line[begin].ToString()) :
+                            acumulator * long.Parse(line[begin].ToString());
+                                break;
+                            }
+                        case ' ':
+                            {
+                                acumulator = long.Parse(line[begin].ToString());
+                                break;
+                            }
                     }
                 }
-                lineIndex++;
+                else
+                {
+                    if (line[begin] == '(')
+                    {
+                        var result = Parantheses(line, begin + 1);
+                        switch (operation)
+                        {
+                            case '+':
+                                {
+                                    acumulator += result.Item1;
+                                    break;
+                                }
+                            case '*':
+                                {
+                                    acumulator = acumulator == 0 ? result.Item1 : acumulator * result.Item1;
+                                    break;
+                                }
+                            case ' ':
+                                {
+                                    acumulator = result.Item1;
+                                    break;
+                                }
+                        }
+                        begin = result.Item2 - 1;
+                    }
+                    else
+                    if (line[begin] == ')')
+                    {
+                        return (acumulator, begin + 1);
+                    }
+                    else
+                    {
+                        operation = line[begin];
+                    }
+
+                }
+                begin++;
             }
+            return (0, 0);
         }
         public void Part1()
         {
-            var activeCubesTemporary = new List<(int, int, int)>();
-            var Neightbours = new Dictionary<(int, int, int), int>();
-
-            for (var cycle = 0; cycle < 6; cycle++)
+            var acumulator = 0L;
+            var operation = ' ';
+            var results = new List<long>();
+            foreach (var line in Expressions)
             {
-                Neightbours.Clear();
-                foreach (var cub in ActiveCubes3D)
+                acumulator = 0;
+                operation = ' ';
+                for (var i = 0; i < line.Length; i++)
                 {
-                    FoundNeightbours3D(cub, Neightbours);
-                }
-
-                activeCubesTemporary.Clear();
-                foreach (var (cube, count) in Neightbours)
-                {
-                    if (count == 2 && ActiveCubes3D.Contains(cube))
+                    if ("0123456789".Contains(line[i]))
                     {
-                        activeCubesTemporary.Add(cube);
+                        switch (operation)
+                        {
+                            case '+':
+                                {
+                                    acumulator += long.Parse(line[i].ToString());
+                                    break;
+                                }
+                            case '*':
+                                {
+                                    acumulator = acumulator == 0 ? long.Parse(line[i].ToString()) : acumulator * long.Parse(line[i].ToString());
+                                    break;
+                                }
+                            case ' ':
+                                {
+                                    acumulator = long.Parse(line[i].ToString());
+                                    break;
+                                }
+                        }
                     }
-                    else if (count == 3)
+                    else
                     {
-                        activeCubesTemporary.Add(cube);
+                        if (line[i] == '(')
+                        {
+                            var result = Parantheses(line, i + 1);
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += result.Item1;
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? result.Item1 : acumulator * result.Item1;
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = result.Item1;
+                                        break;
+                                    }
+                            }
+                            i = result.Item2 - 1;
+                        }
+                        else
+                        {
+                            operation = line[i];
+                        }
                     }
                 }
-
-
-                var swap = ActiveCubes3D;
-                ActiveCubes3D = activeCubesTemporary;
-                activeCubesTemporary = swap;
+                results.Add(acumulator);
             }
 
-            Console.WriteLine($"Day 18: Conway Cubes {ActiveCubes3D.Count} (part1)");
+            Console.WriteLine($"Day 18: Operation Order {results.Sum()} (part1)");
         }
-        private void FoundNeightbours3D((int x, int y, int z) cube, Dictionary<(int, int, int), int> Neightbours)
+        private (long, int) Parantheses2(string line, int begin)
         {
-            foreach (var (x, y, z) in Positions2D)
+            long acumulator = 0;
+            var operation = ' ';
+            while (begin < line.Length)
             {
-                var pos = (cube.x + x, cube.y + y, cube.z + z);
-                if (Neightbours.ContainsKey(pos))
+                if (line[begin] == '(' && AdditionIsNext(line, begin))
                 {
-                    Neightbours[pos]++;
+                    var result = Addition(line, begin);
+                    switch (operation)
+                    {
+                        case '+':
+                            {
+                                acumulator += result.Item1;
+                                break;
+                            }
+                        case '*':
+                            {
+                                acumulator = acumulator == 0 ? result.Item1 :
+                            acumulator * result.Item1;
+                                break;
+                            }
+                        case ' ':
+                            {
+                                acumulator = result.Item1;
+                                break;
+                            }
+                    }
+                    begin = result.Item2 - 1;
                 }
                 else
                 {
-                    Neightbours[pos] = 1;
+                    if ("0123456789".Contains(line[begin]))
+                    {
+                        if (line[begin + 1] == '+')
+                        {
+                            var result = Addition(line, begin);
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += result.Item1;
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? result.Item1 :
+                                    acumulator * result.Item1;
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = result.Item1;
+                                        break;
+                                    }
+                            }
+                            begin = result.Item2 - 1;
+                        }
+                        else
+                        {
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += long.Parse(line[begin].ToString());
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? long.Parse(line[begin].ToString()) :
+                                    acumulator * long.Parse(line[begin].ToString());
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = long.Parse(line[begin].ToString());
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (line[begin] == '(')
+                        {
+                            var result = Parantheses2(line, begin + 1);
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += result.Item1;
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? result.Item1 : acumulator * result.Item1;
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = result.Item1;
+                                        break;
+                                    }
+                            }
+                            begin = result.Item2;
+                        }
+                        else
+                        if (line[begin] == ')')
+                        {
+                            return (acumulator, begin);
+                        }
+                        else
+                        {
+                            operation = line[begin];
+                        }
+
+                    }
                 }
+                begin++;
             }
+            return (0, 0);
         }
-        private void FoundNeightbours4D((int x, int y, int z, int w) cube, Dictionary<(int, int, int, int), int> Neightbours)
+        private (long, int) Addition(string line, int begin)
         {
-            foreach (var (x, y, z, w) in Positions4D)
+            var acumulator = 0L;
+            while (begin < line.Length)
             {
-                var pos = (cube.x + x, cube.y + y, cube.z + z, cube.w + w);
-                if (Neightbours.ContainsKey(pos))
+
+                if ("0123456789".Contains(line[begin]))
                 {
-                    Neightbours[pos]++;
+                    acumulator += long.Parse(line[begin].ToString());
                 }
                 else
                 {
-                    Neightbours[pos] = 1;
+                    if (line[begin] == '(')
+                    {
+                        var result = Parantheses2(line, begin + 1);
+                        acumulator += result.Item1;
+                        begin = result.Item2;
+                    }
                 }
+
+                if (begin == line.Length - 1 || (line[begin] == ')' && line[begin + 1] != '+') || (line[begin + 1] != '+' && "0123456789".Contains(line[begin]) && line[begin + 1] != '('))
+                {
+                    return (acumulator, begin + 1);
+                }
+
+                begin++;
             }
+            return (0, 0);
+        }
+        private bool AdditionIsNext(string line, int index)
+        {
+            var param = 0;
+            while (index < line.Length && line[index] != ')')
+            {
+                if(line[index] == '(')
+                {
+                    param++;
+                }
+                index++;
+
+                if (line[index] == ')')
+                {
+                    param--;
+                    if (param != 0)
+                    {
+                        index++;
+                    }
+                }
+                
+            }
+            return index == line.Length - 1 ? false : line[index + 1] == '+';
         }
         public void Part2()
         {
-            var activeCubesTemporary = new List<(int, int, int, int)>();
-            var Neightbours = new Dictionary<(int, int, int, int), int>();
-
-            for (var cycle = 0; cycle < 6; cycle++)
+            var acumulator = 0L;
+            var operation = ' ';
+            var results = new List<long>();
+            foreach (var line in Expressions)
             {
-                Neightbours.Clear();
-                foreach (var cub in ActiveCubes4D)
+                acumulator = 0;
+                operation = ' ';
+                for (var i = 0; i < line.Length; i++)
                 {
-                    FoundNeightbours4D(cub, Neightbours);
-                }
-
-                activeCubesTemporary.Clear();
-                foreach (var (cube, count) in Neightbours)
-                {
-                    if (count == 2 && ActiveCubes4D.Contains(cube))
+                    if (line[i] == '(' && AdditionIsNext(line, i))
                     {
-                        activeCubesTemporary.Add(cube);
+                        var result = Addition(line, i);
+                        switch (operation)
+                        {
+                            case '+':
+                                {
+                                    acumulator += result.Item1;
+                                    break;
+                                }
+                            case '*':
+                                {
+                                    acumulator = acumulator == 0 ? result.Item1 :
+                                acumulator * result.Item1;
+                                    break;
+                                }
+                            case ' ':
+                                {
+                                    acumulator = result.Item1;
+                                    break;
+                                }
+                        }
+                        i = result.Item2;
                     }
-                    else if (count == 3)
+                    if (i >= line.Length)
                     {
-                        activeCubesTemporary.Add(cube);
+                        continue;
+                    }
+                    if ("0123456789".Contains(line[i]))
+                    {
+                        if (i != line.Length - 1 && line[i + 1] == '+')
+                        {
+                            var result = Addition(line, i);
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += result.Item1;
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? result.Item1 :
+                                    acumulator * result.Item1;
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = result.Item1;
+                                        break;
+                                    }
+                            }
+                            i = result.Item2 - 1;
+                        }
+                        else
+                        {
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += long.Parse(line[i].ToString());
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? long.Parse(line[i].ToString()) : acumulator * long.Parse(line[i].ToString());
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = long.Parse(line[i].ToString());
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (line[i] == '(')
+                        {
+                            var result = Parantheses2(line, i + 1);
+                            switch (operation)
+                            {
+                                case '+':
+                                    {
+                                        acumulator += result.Item1;
+                                        break;
+                                    }
+                                case '*':
+                                    {
+                                        acumulator = acumulator == 0 ? result.Item1 : acumulator * result.Item1;
+                                        break;
+                                    }
+                                case ' ':
+                                    {
+                                        acumulator = result.Item1;
+                                        break;
+                                    }
+                            }
+                            i = result.Item2;
+                        }
+                        else
+                        {
+                            operation = line[i];
+                        }
                     }
                 }
-
-
-                var swap = ActiveCubes4D;
-                ActiveCubes4D = activeCubesTemporary;
-                activeCubesTemporary = swap;
+                results.Add(acumulator);
             }
 
-            Console.WriteLine($"Day 18: Conway Cubes {ActiveCubes4D.Count} (part2)");
+            Console.WriteLine($"Day 18: Operation Order {results.Sum()} (part2)");
         }
     }
 }
