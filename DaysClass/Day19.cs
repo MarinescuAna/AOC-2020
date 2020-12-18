@@ -5,18 +5,9 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
-    public static class Day17Process
+    public class Day19
     {
-        private static Day17 Day17 = new Day17();
-        public static void Process()
-        {
-            Day17.Part1();
-            Day17.Part2();
-        }
-    }
-    public class Day17
-    {
-        private static StreamReader file = new StreamReader(Constants.Path + "In17.txt");
+        private static StreamReader file = new StreamReader(Constants.Path + "In19.txt");
         private List<(int, int, int)> ActiveCubes3D = new List<(int, int, int)>();
         private List<(int, int, int,int)> ActiveCubes4D = new List<(int, int, int,int)>();
         private List<(int, int, int)> Positions2D = new List<(int, int, int)> {
@@ -29,7 +20,7 @@ namespace AOC.DaysClass
             (0, 0, 0, 1), (1, 1, 0, 1), (1, 0, 0, 1), (1, -1, 0, 1), (0, -1, 0, 1), (-1, -1, 0, 1), (-1, 0, 0, 1), (-1, 1, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1), (1, 0, 1, 1), (1, -1, 1, 1), (0, -1, 1, 1), (-1, -1, 1, 1), (-1, 0, 1, 1), (-1, 1, 1, 1), (0, 1, 1, 1), (0, 0, -1, 1), (1, 1, -1, 1), (1, 0, -1, 1), (1, -1, -1, 1), (0, -1, -1, 1), (-1, -1, -1, 1), (-1, 0, -1, 1), (-1, 1, -1, 1),
             (0, 1, -1, 1), (0, 0, 0, -1), (1, 1, 0, -1), (1, 0, 0, -1), (1, -1, 0, -1), (0, -1, 0, -1), (-1, -1, 0, -1), (-1, 0, 0, -1), (-1, 1, 0, -1), (0, 1, 0, -1), (0, 0, 1, -1), (1, 1, 1, -1), (1, 0, 1, -1), (1, -1, 1, -1), (0, -1, 1, -1), (-1, -1, 1, -1), (-1, 0, 1, -1), (-1, 1, 1, -1), (0, 1, 1, -1), (0, 0, -1, -1), (1, 1, -1, -1), (1, 0, -1, -1), (1, -1, -1, -1), (0, -1, -1, -1), (-1, -1, -1, -1), (-1, 0, -1, -1), (-1, 1, -1, -1), (0, 1, -1, -1)
          };
-        public Day17()
+        public Day19()
         {
             ReadInput();
         }
@@ -83,7 +74,7 @@ namespace AOC.DaysClass
                 activeCubesTemporary = swap;
             }
 
-            Console.WriteLine($"Day 17: Conway Cubes {ActiveCubes3D.Count} (part1)");
+            Console.WriteLine($"Day 19: Conway Cubes {ActiveCubes3D.Count} (part1)");
         }
         private void FoundNeightbours3D((int x, int y, int z) cube, Dictionary<(int, int, int), int> Neightbours)
         {
@@ -147,7 +138,17 @@ namespace AOC.DaysClass
                 activeCubesTemporary = swap;
             }
 
-            Console.WriteLine($"Day 17: Conway Cubes {ActiveCubes4D.Count} (part2)");
+            Console.WriteLine($"Day 19: Conway Cubes {ActiveCubes4D.Count} (part2)");
+        }
+    }
+
+    public static class Day19Process
+    {
+        private static Day19 Day19 = new Day19();
+        public static void Process()
+        {
+            Day19.Part1();
+            Day19.Part2();
         }
     }
 }

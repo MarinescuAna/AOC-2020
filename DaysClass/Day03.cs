@@ -4,6 +4,15 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day03Process
+    {
+        private static Day03 Day = new Day03();
+        public static void Process()
+        {
+            Day.Part1();
+            Day.Part2();
+        }
+    }
     public class Day03
     {
         private string[] map = new string[354];

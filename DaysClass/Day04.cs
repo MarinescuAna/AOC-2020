@@ -5,6 +5,15 @@ using System.Text.RegularExpressions;
 
 namespace AOC.DaysClass
 {
+    public static class Day04Process
+    {
+        private static Day04 Day = new Day04();
+        public static void Process()
+        {
+            Day.Part1();
+            Day.Part2();
+        }
+    }
     public class Day04
     {
         private readonly string[] fields = {

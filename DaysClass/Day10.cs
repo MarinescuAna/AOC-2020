@@ -4,11 +4,20 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day10Process
+    {
+        private static Day10 Day = new Day10();
+        public static void Process()
+        {
+            Day.Part1();
+            Day.Part2();
+        }
+    }
     public class Day10
     {
         private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In10.txt");
         private List<int> adapters = new List<int>();
-       
+
         public Day10()
         {
             ReadInput();
@@ -23,18 +32,18 @@ namespace AOC.DaysClass
             }
 
             adapters.Sort();
-            adapters.Add(adapters[adapters.Count-1]+3);
+            adapters.Add(adapters[adapters.Count - 1] + 3);
         }
 
         public void Part1()
         {
             var frequnecyJolt = new int[5];
-            for(var index = 0; index < adapters.Count-1; index++)
+            for (var index = 0; index < adapters.Count - 1; index++)
             {
 
                 frequnecyJolt[adapters[index + 1] - adapters[index]]++;
             }
-           Console.WriteLine("Day 10: Adapter Array {0} (part1)", frequnecyJolt[1]* frequnecyJolt[3]);
+            Console.WriteLine("Day 10: Adapter Array {0} (part1)", frequnecyJolt[1] * frequnecyJolt[3]);
 
         }
         public void Part2()
@@ -54,5 +63,6 @@ namespace AOC.DaysClass
 
             Console.WriteLine("Day 10: Adapter Array {0} (part2)", frequency[0]);
         }
+
     }
 }

@@ -6,6 +6,15 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day16Process
+    {
+        private static Day16 Day16 = new Day16();
+        public static void Process()
+        {
+            Day16.Part1();
+            Day16.Part2();
+        }
+    }
     public class Day16
     {
         private static StreamReader file = new StreamReader(Constants.Path + "In16.txt");

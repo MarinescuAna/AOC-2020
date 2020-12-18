@@ -5,6 +5,15 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day07Process
+    {
+        private static Day07 Day = new Day07();
+        public static void Process()
+        {
+            Day.Part1();
+            Day.Part2();
+        }
+    }
     public class Day07
     {
         private System.IO.StreamReader file = new System.IO.StreamReader(Constants.Path+"In7.txt");

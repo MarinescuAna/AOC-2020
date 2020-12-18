@@ -4,6 +4,15 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day15Process
+    {
+        private static Day15 Day15 = new Day15();
+        public static void Process()
+        {
+            Day15.Part1();
+            Day15.Part2();
+        }
+    }
     public class Day15
     {
         private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In15.txt");

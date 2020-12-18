@@ -4,6 +4,15 @@ using System.Text;
 
 namespace AOC.DaysClass
 {
+    public static class Day11Process
+    {
+        private static Day11 Day = new Day11();
+        public static void Process()
+        {
+            Day.Part1();
+            Day.Part2();
+        }
+    }
     public class Day11
     {
         private System.IO.StreamReader file = new System.IO.StreamReader(@"C:\Users\marin\OneDrive\Documente\GitHub\AOC-2020\DaysText\In11.txt");
@@ -198,7 +207,7 @@ namespace AOC.DaysClass
             {
                 if (line == 0 &&
                     col != 0 &&
-                    col != columns - 1&&
+                    col != columns - 1 &&
                     map[line][col - 1] != '#' &&
                     map[line][col + 1] != '#' &&
                     map[line + 1][col - 1] != '#' &&
@@ -302,7 +311,7 @@ namespace AOC.DaysClass
         }
         private void printMap(char[][] matrix)
         {
-            
+
             for (var i = 0; i < lines; i++)
             {
                 for (var j = 0; j < columns; j++)
@@ -336,8 +345,8 @@ namespace AOC.DaysClass
             while (changeState)
             {
                 changeState = false;
-                
-                copyMatrix(tempMatrix,map);
+
+                copyMatrix(tempMatrix, map);
                 for (var l = 0; l < lines; l++)
                 {
                     for (var c = 0; c < columns; c++)
@@ -345,7 +354,7 @@ namespace AOC.DaysClass
                         if (map[l][c] == '#' && FreeSeat(l, c))
                         {
                             changeState = true;
-                            tempMatrix[l][c] = 'L';                       
+                            tempMatrix[l][c] = 'L';
                         }
                         else
                         {
@@ -357,8 +366,8 @@ namespace AOC.DaysClass
                         }
 
                     }
-                    
-                }               
+
+                }
                 copyMatrix(map, tempMatrix);
             }
 
@@ -373,7 +382,7 @@ namespace AOC.DaysClass
                     }
                 }
             }
-            
+
             Console.WriteLine("Day 11: Seating System {0} (part1)", occupiedSeats);
 
         }
