@@ -1,25 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AOC.DaysClass
 {
     public class Day19
     {
         private static StreamReader file = new StreamReader(Constants.Path + "In19.txt");
-        private List<(int, int, int)> ActiveCubes3D = new List<(int, int, int)>();
-        private List<(int, int, int,int)> ActiveCubes4D = new List<(int, int, int,int)>();
-        private List<(int, int, int)> Positions2D = new List<(int, int, int)> {
-        (1, 1,  0), (1, 0,  0), (1, -1,  0), (0, -1,  0), (-1, -1,  0), (-1, 0,  0), (-1, 1,  0), (0, 1,  0),
-            (1, 1,  1), (1, 0,  1), (1, -1,  1), (0, -1,  1), (-1, -1,  1), (-1, 0,  1), (-1, 1,  1), (0, 1,  1), (0, 0,  1),
-            (1, 1, -1), (1, 0, -1), (1, -1, -1), (0, -1, -1), (-1, -1, -1), (-1, 0, -1), (-1, 1, -1), (0, 1, -1), (0, 0, -1)
-        };
-        private List<(int, int, int, int)> Positions4D = new List<(int, int, int, int)> {
-        (1, 1, 0, 0), (1, 0, 0, 0), (1, -1, 0, 0), (0, -1, 0, 0), (-1, -1, 0, 0), (-1, 0, 0, 0), (-1, 1, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (1, 1, 1, 0), (1, 0, 1, 0), (1, -1, 1, 0), (0, -1, 1, 0), (-1, -1, 1, 0), (-1, 0, 1, 0), (-1, 1, 1, 0), (0, 1, 1, 0), (0, 0, -1, 0), (1, 1, -1, 0), (1, 0, -1, 0), (1, -1, -1, 0), (0, -1, -1, 0), (-1, -1, -1, 0), (-1, 0, -1, 0), (-1, 1, -1, 0), (0, 1, -1, 0),
-            (0, 0, 0, 1), (1, 1, 0, 1), (1, 0, 0, 1), (1, -1, 0, 1), (0, -1, 0, 1), (-1, -1, 0, 1), (-1, 0, 0, 1), (-1, 1, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1), (1, 0, 1, 1), (1, -1, 1, 1), (0, -1, 1, 1), (-1, -1, 1, 1), (-1, 0, 1, 1), (-1, 1, 1, 1), (0, 1, 1, 1), (0, 0, -1, 1), (1, 1, -1, 1), (1, 0, -1, 1), (1, -1, -1, 1), (0, -1, -1, 1), (-1, -1, -1, 1), (-1, 0, -1, 1), (-1, 1, -1, 1),
-            (0, 1, -1, 1), (0, 0, 0, -1), (1, 1, 0, -1), (1, 0, 0, -1), (1, -1, 0, -1), (0, -1, 0, -1), (-1, -1, 0, -1), (-1, 0, 0, -1), (-1, 1, 0, -1), (0, 1, 0, -1), (0, 0, 1, -1), (1, 1, 1, -1), (1, 0, 1, -1), (1, -1, 1, -1), (0, -1, 1, -1), (-1, -1, 1, -1), (-1, 0, 1, -1), (-1, 1, 1, -1), (0, 1, 1, -1), (0, 0, -1, -1), (1, 1, -1, -1), (1, 0, -1, -1), (1, -1, -1, -1), (0, -1, -1, -1), (-1, -1, -1, -1), (-1, 0, -1, -1), (-1, 1, -1, -1), (0, 1, -1, -1)
-         };
+        private Dictionary<int, string> Rules = new Dictionary<int,  string>();
+        private List<string> ReceivedMessage = new List<string>();
         public Day19()
         {
             ReadInput();
@@ -28,117 +20,62 @@ namespace AOC.DaysClass
         private void ReadInput()
         {
             var line = string.Empty;
-            var lineIndex = 0;
             while (!string.IsNullOrEmpty(line = file.ReadLine()))
             {
-                for (var col = 0; col < line.Length; col++)
+                line.Replace(" ", "");
+                if (line.Contains(':'))
                 {
-                    if (line[col] == '#')
-                    {
-                        ActiveCubes3D.Add((lineIndex, col, 0));
-                        ActiveCubes4D.Add((lineIndex, col, 0,0));
-                    }
+                    Rules.Add(int.Parse(line.Split(':')[0]), line.Split(':')[1].Substring(1));
                 }
-                lineIndex++;
+                else if (!string.IsNullOrEmpty(line))
+                {
+                    ReceivedMessage.Add(line);
+                }
             }
+        }
+
+        private string BuildPattern()
+        {
+            string rule = Rules[0];
+            Regex regex = new Regex(@"\d+", RegexOptions.Compiled);
+            while (true)
+            {
+                Match match = regex.Match(rule);
+                if (match.Success)
+                {
+                    string thing = Rules[int.Parse(match.Value)];
+                    if (thing.Contains("\""))
+                    {
+                        thing = thing.Substring(1, thing.Length - 2);
+                    }
+                    else
+                    {
+                        thing = "(" + thing + ")";
+                    }
+                    rule = regex.Replace(rule, thing, 1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return rule.Replace(" ","");
         }
         public void Part1()
         {
-            var activeCubesTemporary = new List<(int, int, int)>();
-            var Neightbours = new Dictionary<(int, int, int), int>();
-
-            for (var cycle = 0; cycle < 6; cycle++)
-            {
-                Neightbours.Clear();
-                foreach (var cub in ActiveCubes3D)
-                {
-                    FoundNeightbours3D(cub, Neightbours);
-                }
-
-                activeCubesTemporary.Clear();
-                foreach (var (cube, count) in Neightbours)
-                {
-                    if (count == 2 && ActiveCubes3D.Contains(cube))
-                    {
-                        activeCubesTemporary.Add(cube);
-                    }
-                    else if (count == 3)
-                    {
-                        activeCubesTemporary.Add(cube);
-                    }
-                }
-
-
-                var swap = ActiveCubes3D;
-                ActiveCubes3D = activeCubesTemporary;
-                activeCubesTemporary = swap;
-            }
-
-            Console.WriteLine($"Day 19: Conway Cubes {ActiveCubes3D.Count} (part1)");
+            var pattern = BuildPattern();
+            Console.WriteLine($"Day 19: Conway Cubes {ReceivedMessage.Where(s=> Regex.IsMatch(s, "^" + pattern + "$")).Count()} (part1)");
         }
-        private void FoundNeightbours3D((int x, int y, int z) cube, Dictionary<(int, int, int), int> Neightbours)
-        {
-            foreach (var (x, y, z) in Positions2D)
-            {
-                var pos = (cube.x + x, cube.y + y, cube.z + z);
-                if (Neightbours.ContainsKey(pos))
-                {
-                    Neightbours[pos]++;
-                }
-                else
-                {
-                    Neightbours[pos] = 1;
-                }
-            }
-        }
-        private void FoundNeightbours4D((int x, int y, int z, int w) cube, Dictionary<(int, int, int, int), int> Neightbours)
-        {
-            foreach (var (x, y, z, w) in Positions4D)
-            {
-                var pos = (cube.x + x, cube.y + y, cube.z + z, cube.w + w);
-                if (Neightbours.ContainsKey(pos))
-                {
-                    Neightbours[pos]++;
-                }
-                else
-                {
-                    Neightbours[pos] = 1;
-                }
-            }
-        }
+
         public void Part2()
         {
-            var activeCubesTemporary = new List<(int, int, int, int)>();
-            var Neightbours = new Dictionary<(int, int, int, int), int>();
-
-            for (var cycle = 0; cycle < 6; cycle++)
+            var pattern = BuildPattern();
+            var list = ReceivedMessage.Where(s => Regex.IsMatch(s, "^" + pattern + "$"));
+            foreach(var t in list)
             {
-                Neightbours.Clear();
-                foreach (var cub in ActiveCubes4D)
-                {
-                    FoundNeightbours4D(cub, Neightbours);
-                }
-
-                activeCubesTemporary.Clear();
-                foreach (var (cube, count) in Neightbours)
-                {
-                    if (count == 2 && ActiveCubes4D.Contains(cube))
-                    {
-                        activeCubesTemporary.Add(cube);
-                    }
-                    else if (count == 3)
-                    {
-                        activeCubesTemporary.Add(cube);
-                    }
-                }
-
-
-                var swap = ActiveCubes4D;
-                ActiveCubes4D = activeCubesTemporary;
-                activeCubesTemporary = swap;
+                Console.WriteLine(t);
             }
-
-            Console.WriteLine($"Day 19: Conway Cubes {ActiveCubes4D.Count} (part2)");
+           // Console.WriteLine($"Day 19: Conway Cubes {list.Count} (part1)");
         }
     }
 
