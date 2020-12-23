@@ -15,107 +15,202 @@ namespace AOC.DaysClass
             Day20.Part2();
         }
     }
+    public class Tile
+    {
+        public int Id;
+        public List<List<(int, int)>> Positions = new List<List<(int, int)>>();
+        public Tile(int id)
+        {
+            Id = id;
+        }
+        public void Flip()
+        {
+
+        }
+    }
     public class Day20
     {
         private static StreamReader file = new StreamReader(Constants.Path + "In20.txt");
-        private Dictionary<string, List<(int, int)>> ranges = new Dictionary<string, List<(int, int)>>();
-        private List<int> myTicket = new List<int>();
-        private List<List<int>> nearbyTickets = new List<List<int>>();
+        private List<Tile> tiles = new List<Tile>();
         public Day20()
         {
             ReadInput();
         }
 
+        private List<List<(int,int)>> FindPositions(string[] tile)
+        {
+            var list = new List<List<(int, int)>>();
+            var line = new List<(int, int)>();
+            for(var i = 0; i < 10; i++)
+            {
+                if (tile[0][i] == '#')
+                {
+                    line.Add((0, i));
+                }
+            }
+            list.Add(line);
+            line.Clear();
+            for (var i = 0; i < 10; i++)
+            {
+                if (tile[9][i] == '#')
+                {
+                    line.Add((9, i));
+                }
+            }
+            list.Add(line);
+            line.Clear();
+            for (var i = 0; i < 10; i++)
+            {
+                if (tile[i][0] == '#')
+                {
+                    line.Add((i, 0));
+                }
+            }
+            list.Add(line);
+            line.Clear();
+            for (var i = 0; i < 10; i++)
+            {
+                if (tile[i][9] == '#')
+                {
+                    line.Add(( i,9));
+                }
+            }
+            list.Add(line);
+            return list;
+        }
         private void ReadInput()
         {
-
             var line = string.Empty;
-            var tags = new List<string>();
-
-            while (!string.IsNullOrEmpty((line = file.ReadLine())))
+            var lines = 0;
+            var tile = new string[10];
+            Tile tile1=null;
+            while ((line = file.ReadLine()) != null)
             {
-                var text = line.Split(':');
-                tags.Add(text[0]);
-                var splitOr = text[1].Split("or");
-                var list = new List<(int, int)> {
-                    (int.Parse(splitOr[0].Split('-')[0]), int.Parse(splitOr[0].Split('-')[1])),
-                    (int.Parse(splitOr[1].Split('-')[0]), int.Parse(splitOr[1].Split('-')[1]))
-                };
-                ranges.Add(text[0], list);
-            }
-            while (!string.IsNullOrEmpty((line = file.ReadLine())))
-            {
-                var splitComma = line.Split(',');
-                foreach (var number in splitComma)
+                if (string.IsNullOrEmpty(line))
                 {
-                    myTicket.Add(int.Parse(number));
+                    tile1.Positions = FindPositions(tile);
+                    tiles.Add(tile1);
+                    Array.Clear(tile,0,tile.Length);
+                    lines = 0;
+                    tile1 = null;
+                }
+                else
+                if (line.Contains("Tile"))
+                {
+                    tile1 =new Tile(int.Parse(line.Replace("Tile ", "").Replace(":", "")));
+                }
+                else
+                {
+                    tile[lines++]=line;
                 }
             }
-            while (!string.IsNullOrEmpty((line = file.ReadLine())))
-            {
-                var splitComma = line.Split(',');
-                var list = new List<int>();
-                foreach (var number in splitComma)
-                {
-                    list.Add(int.Parse(number));
-                }
-                nearbyTickets.Add(list);
-            }
-
+            tile1.Positions = FindPositions(tile);
+            tiles.Add(tile1);
         }
-        private bool IsValid(List<int> ticket)
+        private bool UpOrDownMarginMatch(string[] tile1, string[] til2, int line)
         {
-            foreach(var range in ranges)
+            var line2 = line==0?9:0;
+            var isMatch = true;
+          
+            for (var j = 0; j < tile1[0].Length && isMatch; j++)
             {
-                if(!ticket.All(x => range.Value.ToList().Any(y => x >= y.Item1 && x <= y.Item2)))
+                if (tile1[line][j] != til2[line2][j])
                 {
-                    return false;
+                    isMatch = false;
                 }
             }
-            return true;
+
+            if (!isMatch)
+            {
+                isMatch = true;
+                for (var j = 0; j < tile1.Length && isMatch; j++)
+                {
+                    if (tile1[line][j] != til2[line2][9-j])
+                    {
+                        isMatch = false;
+                    }
+                }
+            }
+            return isMatch;
+
         }
-        private bool IsPartOfRange(int number) =>
-            ranges.Where(u => SearchIn(number, u.Value)).Count() != 0;
-        private bool SearchIn(int numberToSearch, List<(int, int)> list) =>
-            list.FindIndex(u => (numberToSearch >= u.Item1 && numberToSearch <= u.Item2)) != -1;
+        private bool LeftOrRightMarginMatch(string[] tile1, string[] til2, int col)
+        {
+            var col2 = col==0?9:0;
+            var isMatch = true;
+            for (var j = 0; j < tile1.Length; j++)
+            {
+                if (tile1[j][col] != til2[j][col2])
+                {
+                    isMatch = false;
+                }
+            }
+            if (!isMatch)
+            {
+                isMatch = true;
+                for (var j = 0; j < tile1.Length; j++)
+                {
+                    if (tile1[j][col] != til2[9-j][col2])
+                    {
+                        isMatch = false;
+                    }
+                }
+            }
+            return isMatch;
+
+        }
         public void Part1()
         {
-            var sum = 0L;
-            foreach (var list in nearbyTickets)
+            var prod = 1L;
+            for(var i=0;i< tiles.Count;i++)
             {
-                sum += list.Where(u => !IsPartOfRange(u)).Sum();
+                var freqConner = new int[5];
+                //1->up
+                //2->down
+                //3->right
+                //4->left
+                for(var j=0;j<9;j++)
+                {
+                   /* if (j != i)
+                    {
+                        if (UpOrDownMarginMatch(tiles[i], tiles[j], 0))
+                        {
+                            freqConner[1]++;
+                        }
+                        if (UpOrDownMarginMatch(tiles[i], tiles[j], tiles.Count - 1))
+                        {
+                            freqConner[2]++;
+                        }
+                        if (LeftOrRightMarginMatch(tiles[i], tiles[j], 0))
+                        {
+                            freqConner[4]++;
+                        }
+                        if (LeftOrRightMarginMatch(tiles[i], tiles[j], tiles[0].Length - 1))
+                        {
+                            freqConner[3]++;
+                        }
+                    }*/
+                }
+                var notMatch = 0;
+                for (var k = 1; k <= 4; k++)
+                {
+                    if (freqConner[k] == 0)
+                    {
+                        notMatch++;
+                    }
+                }
+                if (notMatch == 2)
+                {
+                    //prod *= ids[i];
+                }
             }
-            Console.WriteLine("Day 16: Ticket Translation {0} (part1)", sum);
+            Console.WriteLine("Day 16: Ticket Translation {0} (part1)", prod);
         }
-        private bool AllNumbersMatch(string key, List<int> tickets) => tickets.All(x => ranges[key].FindIndex(y => x >= y.Item1 && x <= y.Item2)!=-1);
-        private List<List<int>> Transpose(List<List<int>> input)
+          public void Part2()
         {
-            var result = new List<List<int>>();
-            for (int i = 0; i < input[0].Count(); i++)
-            {
-                result.Add(input.Select(x => x[i]).ToList());
-            }
-            return result;
-        }
-        public void Part2()
-        {
-            long prod = 1;
-            var freq = new int[nearbyTickets.Count + 1];
-
-            var validTickets = nearbyTickets.Where(x => IsValid(x)).ToList();
-            var transposedTickets = Transpose(validTickets);
-            var tickets = transposedTickets.Select((a, i) => (Fields: ranges.Keys.Where(x => AllNumbersMatch(x, a)), Index: i)).OrderBy(x => x.Fields.Count()).ToList();
-
-
-            var times = new int[21];
-
-            for (var ticket = 0; ticket < validTickets.Count; ticket++)
-            {
-               // Console.WriteLine($"{myTicket[matchingFields.First().Fields]} => {firstMatch.Fields.First()}");
-                //Console.WriteLine(ticket+":"+myTicket[ticket] + " => " + validTickets[ticket].Item2.Count+" - "+ validTickets[ticket].Item1);
-            }
-
-            Console.WriteLine("Day 16: Ticket Translation {0} (part2)", prod);
+            
+    
+            //Console.WriteLine("Day 16: Ticket Translation {0} (part2)", prod);
         }
     }
 
